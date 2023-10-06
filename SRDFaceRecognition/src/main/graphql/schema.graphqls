@@ -1,0 +1,137 @@
+"""EventLog schema"""
+type EventLog {
+  """EventLog Id"""
+  id: ID!
+
+  """EventLog type"""
+  type: EventType!
+
+  """A timestamp for the event"""
+  timestamp: DateTime!
+
+  """A json string for metaData. Max length is 1000 characters"""
+  metaData: String
+
+  """The time when created"""
+  createdAt: DateTime!
+}
+
+"""Type of event"""
+enum EventType {
+  """
+  Event associated when the subject moves away from the screen and is not on camera
+  """
+  MOVED_AWAY
+
+  """Event associated when multiple subjects enter the screen"""
+  MULTIPLE_SUBJECTS
+
+  """Event associated when an unknown subject enters the screen"""
+  UNKNOWN_SUBJECT
+}
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+"""Organization schema"""
+type Organization {
+  """Organization Id"""
+  id: ID!
+
+  """The name/username of the organization"""
+  username: String!
+
+  """The time when created"""
+  createdAt: DateTime!
+}
+
+"""WebHook schema"""
+type WebHook {
+  """WebHook Id"""
+  id: ID!
+
+  """Webhook url"""
+  url: String!
+}
+
+"""Project schema"""
+type Project {
+  """Project Id"""
+  id: ID!
+
+  """project name"""
+  name: String!
+
+  """Time when the project was created"""
+  createdAt: DateTime!
+
+  """get this projects's events"""
+  events(params: GetEventsInput): [EventLog!]!
+
+  """get this projects's webhooks"""
+  webHooks: [WebHook!]!
+}
+
+input PaginationArgs {
+  """Number of items to take"""
+  take: Int
+
+  """Number of items to skip"""
+  skip: Int
+
+  """Field name to order by"""
+  fieldName: String
+
+  """Direction to order by."""
+  direction: Direction
+}
+
+"""The basic directions"""
+enum Direction {
+  """Sort in descending order"""
+  DESC
+
+  """Sort in ascending order"""
+  ASC
+}
+
+"""Input to create a new event"""
+input CreateEventInput {
+  """Type of the EventLog"""
+  type: EventType!
+
+  """Timestamp of the EventLog"""
+  timestamp: DateTime!
+
+  """MetaData of the EventLog. A json string. Max length is 1000 characters"""
+  metaData: String!
+}
+
+input GetEventLogsFilter {
+  """Type of the EventLog"""
+  type: EventType
+}
+
+"""Input to filter and paginate getting event logs"""
+input GetEventsInput {
+  """Filter getting eventLogs"""
+  filters: GetEventLogsFilter
+
+  """Pagination of the EventLog"""
+  pagination: PaginationArgs
+}
+
+type Query {
+  """ping the backend"""
+  ping: String!
+
+  """get the Project of the authorized key"""
+  project: Project!
+}
+
+type Mutation {
+  """Create an event"""
+  createEvent(input: CreateEventInput!): EventLog!
+}
